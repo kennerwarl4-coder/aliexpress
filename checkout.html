@@ -467,6 +467,8 @@
     }
     .btn-save:hover { background: #c62828; }
 
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
     /* PIX Modal */
     .pix-modal-inner { text-align: center; }
     .pix-qr-area { margin: 16px auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -592,7 +594,18 @@
           </div>
           <div class="form-group" style="flex:1.2;">
             <label>Telefone com DDD *</label>
-            <input type="tel" id="input_phone" required placeholder="(11) 99999-9999" autocomplete="tel">
+            <input type="tel" id="input_phone" required placeholder="(48) 99999-9999" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1.2;">
+            <label>CPF *</label>
+            <input type="text" id="input_cpf" required placeholder="000.000.000-00" maxlength="14" autocomplete="off">
+          </div>
+          <div class="form-group" style="flex:2;">
+            <label>E-mail *</label>
+            <input type="email" id="input_email" required placeholder="seu.email@exemplo.com" autocomplete="email">
           </div>
         </div>
 
@@ -889,77 +902,49 @@
       <button class="modal-close" id="btn_close_pix">×</button>
     </div>
     <div class="modal-body pix-modal-inner">
-      <p style="font-size:13px;color:#555;margin-bottom:10px;">Escaneie o QR Code ou copie a chave abaixo para concluir o pagamento</p>
-      <div class="pix-qr-area">
-        <!-- QR Code decorativo SVG -->
-        <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #eee;border-radius:4px;">
-          <rect width="160" height="160" fill="#fff"/>
-          <rect x="8" y="8" width="54" height="54" fill="none" stroke="#222" stroke-width="5"/>
-          <rect x="18" y="18" width="34" height="34" fill="#222"/>
-          <rect x="98" y="8" width="54" height="54" fill="none" stroke="#222" stroke-width="5"/>
-          <rect x="108" y="18" width="34" height="34" fill="#222"/>
-          <rect x="8" y="98" width="54" height="54" fill="none" stroke="#222" stroke-width="5"/>
-          <rect x="18" y="108" width="34" height="34" fill="#222"/>
-          <rect x="70" y="8" width="8" height="8" fill="#222"/>
-          <rect x="80" y="8" width="8" height="8" fill="#222"/>
-          <rect x="70" y="18" width="8" height="8" fill="#222"/>
-          <rect x="70" y="28" width="8" height="8" fill="#222"/>
-          <rect x="80" y="28" width="8" height="8" fill="#222"/>
-          <rect x="70" y="38" width="8" height="8" fill="#222"/>
-          <rect x="80" y="48" width="8" height="8" fill="#222"/>
-          <rect x="70" y="58" width="8" height="8" fill="#222"/>
-          <rect x="8" y="70" width="8" height="8" fill="#222"/>
-          <rect x="18" y="70" width="8" height="8" fill="#222"/>
-          <rect x="28" y="70" width="8" height="8" fill="#222"/>
-          <rect x="38" y="70" width="8" height="8" fill="#222"/>
-          <rect x="48" y="70" width="8" height="8" fill="#222"/>
-          <rect x="58" y="70" width="8" height="8" fill="#222"/>
-          <rect x="70" y="70" width="20" height="20" fill="#00bdae"/>
-          <rect x="98" y="70" width="8" height="8" fill="#222"/>
-          <rect x="110" y="70" width="8" height="8" fill="#222"/>
-          <rect x="130" y="70" width="8" height="8" fill="#222"/>
-          <rect x="144" y="70" width="8" height="8" fill="#222"/>
-          <rect x="98" y="80" width="8" height="8" fill="#222"/>
-          <rect x="120" y="80" width="8" height="8" fill="#222"/>
-          <rect x="98" y="90" width="8" height="8" fill="#222"/>
-          <rect x="110" y="90" width="8" height="8" fill="#222"/>
-          <rect x="120" y="90" width="8" height="8" fill="#222"/>
-          <rect x="130" y="90" width="8" height="8" fill="#222"/>
-          <rect x="144" y="90" width="8" height="8" fill="#222"/>
-          <rect x="70" y="98" width="8" height="8" fill="#222"/>
-          <rect x="70" y="108" width="8" height="8" fill="#222"/>
-          <rect x="80" y="108" width="8" height="8" fill="#222"/>
-          <rect x="70" y="118" width="8" height="8" fill="#222"/>
-          <rect x="70" y="128" width="8" height="8" fill="#222"/>
-          <rect x="80" y="130" width="8" height="8" fill="#222"/>
-          <rect x="70" y="144" width="8" height="8" fill="#222"/>
-          <rect x="98" y="108" width="8" height="8" fill="#222"/>
-          <rect x="120" y="108" width="8" height="8" fill="#222"/>
-          <rect x="144" y="108" width="8" height="8" fill="#222"/>
-          <rect x="98" y="120" width="8" height="8" fill="#222"/>
-          <rect x="108" y="120" width="8" height="8" fill="#222"/>
-          <rect x="130" y="120" width="8" height="8" fill="#222"/>
-          <rect x="98" y="132" width="8" height="8" fill="#222"/>
-          <rect x="108" y="144" width="8" height="8" fill="#222"/>
-          <rect x="120" y="144" width="8" height="8" fill="#222"/>
-          <rect x="132" y="132" width="8" height="8" fill="#222"/>
-          <rect x="144" y="132" width="8" height="8" fill="#222"/>
-          <rect x="144" y="144" width="8" height="8" fill="#222"/>
-        </svg>
+      <div id="pix_loading" style="padding:40px 20px;text-align:center;">
+        <div style="display:inline-block;width:38px;height:38px;border:3px solid #f3f3f3;border-top:3px solid #e53935;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <p style="font-size:14px;color:#333;margin-top:14px;font-weight:600;">Gerando cobrança PIX oficial...</p>
+        <p style="font-size:12px;color:#888;">Conectando com o gateway BravoPay</p>
       </div>
-      <div class="pix-copy-row">
-        <span class="pix-copy-key" id="pix_key_text">00020126580014br.gov.bcb.pix01366b2d3a89-fastfish-store52040000530398654051479055020053630</span>
-        <button class="btn-copy-pix" id="btn_copy_pix">Copiar</button>
+
+      <div id="pix_content" style="display:none;">
+        <p style="font-size:13px;color:#555;margin-bottom:12px;">Escaneie o QR Code ou copie o código Pix abaixo para pagar:</p>
+        
+        <div class="pix-qr-area" style="margin:12px 0;">
+          <img id="pix_qr_img" src="" alt="QR Code Pix Oficial BravoPay" width="180" height="180" style="border:1px solid #e0e0e0;border-radius:8px;padding:6px;background:#fff;display:inline-block;">
+        </div>
+
+        <div class="pix-copy-row" style="margin:12px 0;">
+          <span class="pix-copy-key" id="pix_key_text" style="font-family:monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;background:#f5f5f5;padding:8px;border-radius:4px;border:1px solid #ddd;color:#333;">...</span>
+          <button class="btn-copy-pix" id="btn_copy_pix" type="button">Copiar Pix</button>
+        </div>
+
+        <div class="pix-timer" style="margin:10px 0;font-size:13px;color:#d32f2f;font-weight:600;">
+          ⏱ Expira em: <span id="pix_countdown">15:00</span>
+        </div>
+
+        <div id="pix_status_indicator" style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1px solid #ffe082;padding:6px 14px;border-radius:20px;font-size:12px;color:#f57f17;margin-bottom:12px;font-weight:500;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f57f17;animation:pulse 1.5s infinite;"></span>
+          Aguardando confirmação do pagamento...
+        </div>
+
+        <ul class="pix-steps-list">
+          <li>1. Abra o app do seu banco ou carteira digital</li>
+          <li>2. Selecione pagar com <strong>Pix → Copia e Cola</strong> ou <strong>Ler QR Code</strong></li>
+          <li>3. Cole a chave copiada ou aponte a câmera pro código</li>
+          <li>4. Confirme o valor de <strong id="pix_value">R$147,90</strong></li>
+          <li>5. A confirmação é automática em poucos segundos!</li>
+        </ul>
+
+        <button class="btn-confirm-pay" id="btn_pix_confirm" type="button" style="margin-top:14px;">Verificar pagamento agora</button>
       </div>
-      <div class="pix-timer">⏱ Expira em: <span id="pix_countdown">15:00</span></div>
-      <ul class="pix-steps-list">
-        <li>1. Abra o app do seu banco</li>
-        <li>2. Acesse a área Pix → "QR Code" ou "Pix Copia e Cola"</li>
-        <li>3. Cole ou escaneie o código acima</li>
-        <li>4. Confirme o pagamento de <strong id="pix_value">R$147,90</strong></li>
-        <li>5. Pronto! Confirmação em instantes ✓</li>
-      </ul>
-      <button class="btn-confirm-pay" id="btn_pix_confirm">Já realizei o pagamento</button>
+
+      <div id="pix_error" style="display:none;padding:30px 10px;text-align:center;">
+        <div style="font-size:36px;color:#e53935;margin-bottom:8px;">⚠️</div>
+        <p style="font-size:14px;color:#222;font-weight:600;" id="pix_error_msg">Não foi possível gerar a cobrança Pix.</p>
+        <button class="btn-confirm-pay" id="btn_pix_retry" type="button" style="margin-top:15px;max-width:200px;margin-left:auto;margin-right:auto;">Tentar novamente</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1052,6 +1037,8 @@
         // pre-fill form fields
         document.getElementById('input_name').value = s.raw_name || '';
         document.getElementById('input_phone').value = s.raw_phone || '';
+        if (document.getElementById('input_cpf')) document.getElementById('input_cpf').value = s.cpf || '';
+        if (document.getElementById('input_email')) document.getElementById('input_email').value = s.email || '';
         document.getElementById('input_cep').value = s.cep || '';
         document.getElementById('input_street').value = s.streetName || '';
         document.getElementById('input_number').value = s.number || '';
@@ -1126,6 +1113,8 @@
     e.preventDefault();
     var nm  = document.getElementById('input_name').value.trim();
     var ph  = document.getElementById('input_phone').value.trim();
+    var cpf = document.getElementById('input_cpf').value.trim();
+    var em  = document.getElementById('input_email').value.trim();
     var cep = document.getElementById('input_cep').value.trim();
     var sn  = document.getElementById('input_street').value.trim();
     var num = document.getElementById('input_number').value.trim();
@@ -1145,6 +1134,7 @@
     try {
       localStorage.setItem('ff_addr', JSON.stringify({
         name: nm.toUpperCase(), raw_name: nm, phone: ph, raw_phone: ph,
+        cpf: cpf, email: em,
         cep: cep, streetName: sn, number: num, comp: cp, bairro: bai,
         cityName: ci, state: st, street: street, city: city
       }));
@@ -1154,28 +1144,196 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // ── PIX TIMER ──
+  // ── INTEGRAÇÃO BRAVOPAY PIX ──
+  var BRAVOPAY_KEY = 'bp_live_7tURfc77GGkkYH8EZEBWhH9DoZHinTHi9Q7FCw';
+  var BRAVOPAY_URL = 'https://bravopay.club/api/v1';
+
+  var currentTxId = null;
+  var pollInterval = null;
   var timerInt = null;
-  function startTimer() {
-    var s = 15*60;
+
+  // Função para capturar parâmetros UTM da URL
+  function getUtms() {
+    var params = new URLSearchParams(window.location.search);
+    return {
+      source: params.get('utm_source') || '',
+      medium: params.get('utm_medium') || '',
+      campaign: params.get('utm_campaign') || '',
+      content: params.get('utm_content') || '',
+      term: params.get('utm_term') || '',
+      fbclid: params.get('fbclid') || '',
+      gclid: params.get('gclid') || '',
+      ttclid: params.get('ttclid') || ''
+    };
+  }
+
+  function startTimer(expiresAtIso) {
+    stopTimer();
+    var targetSec = 15 * 60;
+    if (expiresAtIso) {
+      var expDate = new Date(expiresAtIso).getTime();
+      var now = Date.now();
+      if (expDate > now) {
+        targetSec = Math.floor((expDate - now) / 1000);
+      }
+    }
+
+    var s = targetSec;
     function tick() {
-      var m=Math.floor(s/60), sec=s%60;
-      var el=document.getElementById('pix_countdown');
-      if(el) el.textContent=(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
-      if(s===0){stopTimer();close('modal_pix');}
+      var m = Math.floor(s / 60);
+      var sec = s % 60;
+      var el = document.getElementById('pix_countdown');
+      if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+      if (s <= 0) {
+        stopTimer();
+        stopPolling();
+      }
       s--;
     }
     tick();
-    timerInt = setInterval(tick,1000);
+    timerInt = setInterval(tick, 1000);
   }
-  function stopTimer() { if(timerInt){clearInterval(timerInt);timerInt=null;} }
 
-  // Order button → PIX modal (exige endereço preenchido)
+  function stopTimer() {
+    if (timerInt) { clearInterval(timerInt); timerInt = null; }
+  }
+
+  function stopPolling() {
+    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  }
+
+  // Polling automático do status da transação na BravoPay
+  function startPolling(txId) {
+    stopPolling();
+    currentTxId = txId;
+    var attempts = 0;
+
+    pollInterval = setInterval(function() {
+      attempts++;
+      if (attempts > 180) { // 6 minutos de polling
+        stopPolling();
+        return;
+      }
+
+      fetch(BRAVOPAY_URL + '/transactions/' + txId, {
+        headers: {
+          'Authorization': 'Bearer ' + BRAVOPAY_KEY
+        }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.status === 'PAID') {
+          stopPolling();
+          stopTimer();
+          close('modal_pix');
+          open('modal_success');
+        }
+      })
+      .catch(function(err) {
+        console.warn('Polling check error:', err);
+      });
+    }, 2000); // Checa a cada 2 segundos
+  }
+
+  // Criar transação PIX na BravoPay
+  function createBravoPayPix() {
+    var loadingEl = document.getElementById('pix_loading');
+    var contentEl = document.getElementById('pix_content');
+    var errorEl = document.getElementById('pix_error');
+
+    loadingEl.style.display = 'block';
+    contentEl.style.display = 'none';
+    errorEl.style.display = 'none';
+
+    var savedAddr = null;
+    try { savedAddr = JSON.parse(localStorage.getItem('ff_addr') || 'null'); } catch(e) {}
+    savedAddr = savedAddr || {};
+
+    var totalCents = Math.round(UNIT * qty * 100);
+    var selectedColor = 'Fire Tiger';
+    try { selectedColor = localStorage.getItem('fastfish_selected_color') || 'Fire Tiger'; } catch(e) {}
+
+    var customerCpf = (savedAddr.cpf || document.getElementById('input_cpf').value || '').replace(/\D/g, '');
+    var customerPhone = (savedAddr.phone || document.getElementById('input_phone').value || '').replace(/\D/g, '');
+    var customerEmail = savedAddr.email || document.getElementById('input_email').value || '';
+    var customerName = savedAddr.name || savedAddr.raw_name || document.getElementById('input_name').value || 'Cliente FastFish';
+
+    var orderRef = 'ff_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+
+    var bodyPayload = {
+      amount_cents: totalCents,
+      method: 'pix',
+      customer: {
+        name: customerName,
+        email: customerEmail || ('cliente.' + Date.now() + '@fastfish.com.br'),
+        cpf: customerCpf || undefined,
+        phone: customerPhone || undefined
+      },
+      description: 'Kit Pesca Iniciante FastFish (' + selectedColor + ') - Qtd: ' + qty,
+      external_reference: orderRef,
+      utm: getUtms(),
+      metadata: {
+        cor_isca: selectedColor,
+        quantidade: String(qty),
+        endereco: (savedAddr.street || '') + ' - ' + (savedAddr.city || '')
+      }
+    };
+
+    fetch(BRAVOPAY_URL + '/transactions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + BRAVOPAY_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyPayload)
+    })
+    .then(function(res) {
+      return res.json().then(function(data) {
+        if (!res.ok) {
+          throw new Error((data && data.error && data.error.message) || 'Erro ao gerar PIX');
+        }
+        return data;
+      });
+    })
+    .then(function(tx) {
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'block';
+
+      var pixCopyPaste = tx.pix && tx.pix.copy_paste ? tx.pix.copy_paste : '';
+      var keyTextEl = document.getElementById('pix_key_text');
+      if (keyTextEl) {
+        keyTextEl.textContent = pixCopyPaste;
+        keyTextEl.title = pixCopyPaste;
+      }
+
+      var qrImgEl = document.getElementById('pix_qr_img');
+      if (qrImgEl) {
+        qrImgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=4&data=' + encodeURIComponent(pixCopyPaste);
+      }
+
+      var pixValEl = document.getElementById('pix_value');
+      if (pixValEl) {
+        pixValEl.textContent = fmt(UNIT * qty);
+      }
+
+      startTimer(tx.pix && tx.pix.expires_at);
+      startPolling(tx.id);
+    })
+    .catch(function(err) {
+      console.error('BravoPay PIX creation error:', err);
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      document.getElementById('pix_error_msg').textContent = err.message || 'Erro de conexão com o gateway.';
+    });
+  }
+
+  // Order button → valida endereço e abre PIX oficial
   document.getElementById('btn_order').addEventListener('click', function() {
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem('ff_addr') || 'null'); } catch(e) {}
+    
+    // Se o formulário estiver visível ou faltar dados
     if (!saved || !saved.name) {
-      // Destaca o formulário de endereço
       var addrCard = addrForm.closest('.card');
       addrCard.style.boxShadow = '0 0 0 2px #e53935';
       addrCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1183,34 +1341,75 @@
       setTimeout(function(){ addrCard.style.boxShadow = ''; }, 3000);
       return;
     }
-    stopTimer();
+
     open('modal_pix');
-    startTimer();
+    createBravoPayPix();
   });
 
-  // Copy PIX
+  // Tentar novamente caso de erro
+  var btnRetry = document.getElementById('btn_pix_retry');
+  if (btnRetry) {
+    btnRetry.addEventListener('click', function() {
+      createBravoPayPix();
+    });
+  }
+
+  // Copy PIX Copia-e-Cola
   document.getElementById('btn_copy_pix').addEventListener('click', function() {
     var key = document.getElementById('pix_key_text').textContent;
     var btn = this;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(key).then(function() {
-        btn.textContent='Copiado!'; btn.style.background='#00875a';
-        setTimeout(function(){btn.textContent='Copiar';btn.style.background='';},2000);
+        btn.textContent = 'Copiado! ✓';
+        btn.style.background = '#00875a';
+        setTimeout(function(){ btn.textContent = 'Copiar Pix'; btn.style.background = ''; }, 2500);
       });
     } else {
-      var ta=document.createElement('textarea');ta.value=key;
-      document.body.appendChild(ta);ta.select();document.execCommand('copy');
+      var ta = document.createElement('textarea');
+      ta.value = key;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
       document.body.removeChild(ta);
-      btn.textContent='Copiado!';
-      setTimeout(function(){btn.textContent='Copiar';},2000);
+      btn.textContent = 'Copiado! ✓';
+      setTimeout(function(){ btn.textContent = 'Copiar Pix'; }, 2500);
     }
   });
 
-  // Confirm payment → success
+  // Botão manual de checar status
   document.getElementById('btn_pix_confirm').addEventListener('click', function() {
+    if (!currentTxId) return;
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Verificando no banco...';
+
+    fetch(BRAVOPAY_URL + '/transactions/' + currentTxId, {
+      headers: { 'Authorization': 'Bearer ' + BRAVOPAY_KEY }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      btn.disabled = false;
+      btn.textContent = 'Verificar pagamento agora';
+      if (data && data.status === 'PAID') {
+        stopPolling();
+        stopTimer();
+        close('modal_pix');
+        open('modal_success');
+      } else {
+        alert('Pagamento ainda não identificado. Assim que você transferir via Pix no seu banco, o sistema confirmará automaticamente!');
+      }
+    })
+    .catch(function() {
+      btn.disabled = false;
+      btn.textContent = 'Verificar pagamento agora';
+      alert('Aguardando compensação do Pix. Tente novamente em alguns segundos.');
+    });
+  });
+
+  // Fechar modal para polling e timer
+  document.getElementById('btn_close_pix').addEventListener('click', function() {
+    stopPolling();
     stopTimer();
-    close('modal_pix');
-    open('modal_success');
   });
 
   updateTotals();
