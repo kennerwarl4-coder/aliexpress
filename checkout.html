@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout Seguro - AliExpress</title>
+  <style>
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+    }
+    a { color: #09f; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select { font-family: inherit; }
+
+    /* ── HEADER ── */
+    .page-header {
+      background: #191919;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .page-header a { display: flex; align-items: center; }
+    .ali-logo-svg { height: 30px; }
+
+    /* ── WRAPPER ── */
+    .page-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 20px 40px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    /* ── LEFT COLUMN ── */
+    .col-left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── RIGHT COLUMN ── */
+    .col-right {
+      width: 300px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: sticky;
+      top: 16px;
+    }
+
+    /* ── CARD (white box) ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+      padding: 20px;
+    }
+    .card + .card { /* separação visual */ }
+
+    /* ── ADDRESS CARD ── */
+    .addr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .addr-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+    }
+    .link-blue {
+      color: #09f;
+      font-size: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .link-blue:hover { text-decoration: underline; }
+    .addr-name {
+      font-weight: 700;
+      color: #333;
+      font-size: 13px;
+      display: inline;
+    }
+    .addr-phone {
+      color: #333;
+      font-size: 13px;
+      margin-left: 10px;
+    }
+    .addr-detail {
+      color: #09c;
+      font-size: 13px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* ── PAYMENT CARD ── */
+    .pay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .pay-title { font-size: 16px; font-weight: 700; color: #333; }
+    .pay-list { display: flex; flex-direction: column; gap: 0; }
+    .pay-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+    .pay-item:last-child { border-bottom: none; }
+    .pay-item input[type=radio] {
+      width: 18px; height: 18px;
+      accent-color: #e53935;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .pay-item-body { flex: 1; }
+    .pay-item-row { display: flex; align-items: center; gap: 8px; }
+    .pay-label { font-size: 14px; font-weight: 600; color: #333; }
+    .pay-sub { font-size: 12px; color: #e53935; margin-top: 4px; }
+    .pay-desc { font-size: 12px; color: #777; margin-top: 4px; line-height: 1.5; }
+    .pix-icon-svg { width: 20px; height: 20px; }
+    .pay-selected-bg {
+      background: #fff8f8;
+      border-radius: 4px;
+      padding: 14px 12px;
+      border: 1px solid #f5e0e0;
+    }
+
+    /* ── PRODUCT CARD ── */
+    .prod-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .choice-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .choice-pill {
+      background: #f5c518;
+      color: #191919;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .prod-header-label { font-size: 14px; font-weight: 600; color: #333; }
+    .prod-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .prod-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 1px solid #eee;
+      flex-shrink: 0;
+    }
+    .prod-info { flex: 1; }
+    .prod-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .prod-price-old {
+      font-size: 12px;
+      color: #aaa;
+      text-decoration: line-through;
+      margin-left: 6px;
+      font-weight: 400;
+    }
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      width: fit-content;
+    }
+    .qty-btn {
+      width: 30px;
+      height: 28px;
+      background: #f5f5f5;
+      border: none;
+      font-size: 16px;
+      color: #555;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+    }
+    .qty-btn:hover:not(:disabled) { background: #eee; }
+    .qty-btn:disabled { color: #ccc; cursor: default; }
+    .qty-num {
+      width: 36px;
+      height: 28px;
+      border: none;
+      border-left: 1px solid #d9d9d9;
+      border-right: 1px solid #d9d9d9;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      background: #fff;
+      outline: none;
+    }
+    .prod-ship {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.7;
+    }
+    .prod-ship strong { font-weight: 700; }
+    .prod-ship span { color: #777; }
+
+    /* ── SUMMARY CARD (right) ── */
+    .sum-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 14px; }
+    .sum-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .sum-row:last-of-type { border-bottom: none; }
+    .sum-label { color: #555; }
+    .sum-val { color: #333; font-weight: 500; text-align: right; }
+    .sum-val.free { color: #00a650; }
+    .sum-val.red { color: #e53935; }
+    .sum-coupon-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #777;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .sum-coupon-wrap svg { width: 12px; height: 12px; }
+    .sum-divider { height: 1px; background: #eee; margin: 10px 0; }
+    .sum-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 10px 0 16px;
+    }
+    .sum-total-label { font-size: 15px; font-weight: 700; color: #333; }
+    .sum-total-val { font-size: 22px; font-weight: 700; color: #333; }
+
+    /* ── ORDER BUTTON ── */
+    .btn-order {
+      display: block;
+      width: 100%;
+      background: #e53935;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      text-align: center;
+      letter-spacing: .3px;
+      transition: background .15s;
+    }
+    .btn-order:hover { background: #c62828; }
+
+    .sum-disclaimer {
+      font-size: 11px;
+      color: #999;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+    .sum-disclaimer a { color: #09f; }
+
+    /* ── SECURITY CARD ── */
+    .sec-card-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .sec-title { font-size: 13px; font-weight: 700; color: #333; }
+    .sec-desc { font-size: 12px; color: #777; margin-top: 4px; }
+    .sec-icons { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+    .sec-icon {
+      width: 36px;
+      height: 22px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: #555;
+      font-weight: 700;
+    }
+
+    /* ── FAST DELIVERY CARD ── */
+    .fast-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .fast-items { font-size: 12px; color: #777; line-height: 1.8; }
+    .fast-items .check { color: #00a650; margin-right: 4px; }
+
+    /* ── PAYMENT LOGOS CARD ── */
+    .pay-logos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .pay-logo-pill {
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #333;
+      background: #fafafa;
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      background: #191919;
+      color: #aaa;
+      padding: 28px 20px;
+      margin-top: 24px;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 40px;
+    }
+    .footer-col { flex: 1; }
+    .footer-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 4px; }
+    .footer-links a { font-size: 12px; color: #09f; }
+    .footer-links a:after { content: ","; color: #aaa; margin-left: 2px; }
+    .footer-links a:last-child:after { content: ""; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+      animation: fadeIn .18s ease-out;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 1;
+    }
+    .modal-head h3 { font-size: 16px; font-weight: 700; color: #333; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #aaa;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+    .modal-body { padding: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      font-size: 14px;
+      outline: none;
+      transition: border .2s;
+      color: #333;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: #ff6b00; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+    .btn-cep {
+      height: 38px;
+      padding: 0 14px;
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      align-self: flex-end;
+      margin-bottom: 14px;
+    }
+    .btn-cep:hover { background: #c62828; }
+    .btn-save {
+      width: 100%;
+      padding: 12px;
+      background: #e53935;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background .15s;
+    }
+    .btn-save:hover { background: #c62828; }
+
+    /* PIX Modal */
+    .pix-modal-inner { text-align: center; }
+    .pix-qr-area { margin: 16px auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .pix-copy-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin: 10px 0;
+    }
+    .pix-copy-key { font-size: 11px; font-family: monospace; color: #333; word-break: break-all; text-align: left; flex: 1; }
+    .btn-copy-pix {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 2px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pix-steps-list { text-align: left; margin-top: 12px; }
+    .pix-steps-list li { font-size: 13px; color: #555; margin-bottom: 6px; line-height: 1.4; }
+    .pix-timer { font-size: 13px; color: #e53935; font-weight: 700; margin: 8px 0; }
+    .btn-confirm-pay {
+      width: 100%;
+      padding: 12px;
+      background: #e53935;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .btn-confirm-pay:hover { background: #c62828; }
+
+    /* Success modal */
+    .success-body { text-align: center; padding: 36px 28px; }
+    .success-icon { font-size: 52px; margin-bottom: 10px; }
+    .success-title { font-size: 20px; font-weight: 700; color: #00a650; margin-bottom: 8px; }
+    .success-sub { font-size: 14px; color: #555; line-height: 1.7; }
+    .success-box { background: #f0fdf8; border-radius: 4px; padding: 12px; margin: 14px 0; font-size: 13px; color: #00875a; font-weight: 600; line-height: 1.8; }
+    .btn-back {
+      display: inline-block;
+      padding: 10px 28px;
+      border: 1px solid #09c;
+      color: #09c;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 2px;
+      cursor: pointer;
+      background: none;
+      margin-top: 10px;
+      transition: background .15s;
+    }
+    .btn-back:hover { background: #f0faff; }
+
+    @keyframes fadeIn { from { opacity:0; transform:scale(.97); } to { opacity:1; transform:scale(1); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .page-wrap { flex-direction: column; gap: 12px; }
+      .col-right { width: 100%; position: static; }
+    }
+    @media (max-width: 480px) {
+      .page-wrap { padding: 10px 12px 30px; }
+      .card { padding: 14px; }
+      .form-row { flex-direction: column; gap: 0; }
+      .footer-inner { flex-direction: column; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====== HEADER ====== -->
+<header class="page-header">
+  <a href="index.html">
+    <img src="./index_files/aliexpress-logo.svg" alt="AliExpress" style="height:30px;display:block;">
+  </a>
+</header>
+
+<!-- ====== PAGE BODY ====== -->
+<div class="page-wrap">
+
+  <!-- ── LEFT COLUMN ── -->
+  <div class="col-left">
+
+    <!-- ADDRESS CARD (formulário inline) -->
+    <div class="card">
+      <div class="addr-title" style="margin-bottom:16px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff472e" stroke-width="2.2" style="vertical-align:-3px;margin-right:6px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Endereço de Entrega
+      </div>
+
+      <!-- Resumo do endereço (aparece depois de salvar) -->
+      <div id="addr_filled" style="display:none; margin-bottom:12px; background:#f0fdf8; border:1px solid #c8e6c9; border-radius:6px; padding:12px 14px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <span class="addr-name" id="addr_name"></span>
+            <span class="addr-phone" id="addr_phone"></span>
+            <div class="addr-detail" style="margin-top:4px;">
+              <div id="addr_street"></div>
+              <div id="addr_city"></div>
+            </div>
+          </div>
+          <button class="link-blue" id="btn_edit_address" style="flex-shrink:0;">Alterar</button>
+        </div>
+      </div>
+
+      <!-- Formulário inline -->
+      <form id="form_address_inline" autocomplete="on">
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Nome completo *</label>
+            <input type="text" id="input_name" required placeholder="Seu nome completo" autocomplete="name">
+          </div>
+          <div class="form-group" style="flex:1.2;">
+            <label>Telefone com DDD *</label>
+            <input type="tel" id="input_phone" required placeholder="(11) 99999-9999" autocomplete="tel">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; align-items:flex-end;">
+          <div class="form-group" style="flex:0 0 150px;">
+            <label>CEP *</label>
+            <input type="text" id="input_cep" required placeholder="00000-000" maxlength="9" autocomplete="postal-code">
+          </div>
+          <button type="button" id="btn_busca_cep" class="btn-cep" style="margin-bottom:14px;">Buscar</button>
+          <div class="form-group" style="flex:1;">
+            <label>Bairro *</label>
+            <input type="text" id="input_bairro" required placeholder="Seu bairro">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:3;">
+            <label>Rua / Avenida *</label>
+            <input type="text" id="input_street" required placeholder="Nome da rua ou avenida" autocomplete="street-address">
+          </div>
+          <div class="form-group" style="flex:0 0 90px;">
+            <label>Nº *</label>
+            <input type="text" id="input_number" required placeholder="123">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Complemento</label>
+            <input type="text" id="input_comp" placeholder="Apto, Bloco...">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Cidade *</label>
+            <input type="text" id="input_city" required placeholder="Sua cidade" autocomplete="address-level2">
+          </div>
+          <div class="form-group" style="flex:0 0 70px;">
+            <label>UF *</label>
+            <input type="text" id="input_state" required placeholder="SP" maxlength="2" style="text-transform:uppercase;" autocomplete="address-level1">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-save" id="btn_save_addr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="vertical-align:-2px;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>
+          Salvar endereço
+        </button>
+      </form>
+    </div>
+
+    <!-- PAYMENT CARD -->
+    <div class="card">
+      <div class="pay-header">
+        <div class="pay-title">Métodos de Pagamento</div>
+      </div>
+      <div class="pay-list">
+        <!-- PIX (única opção disponível) -->
+        <div class="pay-item pay-selected-bg">
+          <input type="radio" name="payment" id="pay_pix" checked>
+          <label for="pay_pix" class="pay-item-body" style="cursor:pointer;">
+            <div class="pay-item-row">
+              <!-- Pix logo real -->
+              <img src="./assets/pix-logo-png_seeklogo-392002.webp" alt="Pix" style="width:36px;height:36px;object-fit:contain;">
+              <span class="pay-label">Pix</span>
+            </div>
+            <div class="pay-sub">5% DE DESCONTO &nbsp;·&nbsp; Disponível</div>
+            <div class="pay-desc">Pague pelo aplicativo do seu banco com <strong>QR Code</strong> ou <strong>Pix Copia e Cola</strong>. Confirmação instantânea e liberação expressa do pedido.</div>
+            <div class="pay-desc" style="margin-top:6px;">OFICIAL <strong>FastFish Store</strong> Vendedor Verificado &nbsp;·&nbsp; ✓ Estoque no Brasil</div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT CARD -->
+    <div class="card">
+      <div class="prod-header">
+        <div class="choice-badge">
+          <span class="choice-pill">OFICIAL</span>
+          <span class="prod-header-label">Enviado do Brasil</span>
+        </div>
+        <a href="#" class="link-blue">Visualizar(1)</a>
+      </div>
+      <div class="prod-row">
+        <img class="prod-img"
+          src="./index_files/fastfish/kit.webp"
+          alt="Kit Pesca FastFish"
+          style="width:80px;height:80px;object-fit:cover;border:1px solid #eee;flex-shrink:0;"
+          onerror="this.src='./assets/Kit de Pesca Completo FastFish.png'">
+        <div class="prod-info">
+          <div class="prod-price" id="prod_unit_price">
+            R$147,90
+            <span class="prod-price-old">R$687,90</span>
+          </div>
+          <div class="qty-control">
+            <button class="qty-btn" id="qty_minus" aria-label="Diminuir">−</button>
+            <input class="qty-num" type="text" id="qty_val" value="1" readonly>
+            <button class="qty-btn" id="qty_plus" aria-label="Aumentar">+</button>
+          </div>
+          <div class="prod-ship">
+            <div><strong>Envio: Frete grátis</strong></div>
+            <div><span>Entrega: 3 a 7 dias úteis · Enviado do Brasil</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /col-left -->
+
+  <!-- ── RIGHT COLUMN ── -->
+  <aside class="col-right">
+
+    <!-- SUMMARY CARD -->
+    <div class="card">
+      <div class="sum-title">Resumo</div>
+
+      <div class="sum-row">
+        <span class="sum-label">Subtotal</span>
+        <span class="sum-val" id="sum_subtotal">R$147,90</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Cupom de desconto</span>
+        <span class="sum-coupon-wrap" style="color:#09f;cursor:pointer;">
+          Digite o código aqui
+          <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,1 5,5 9,1"/></svg>
+        </span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Frete</span>
+        <span class="sum-val free">grátis ✓</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Economia da promoção</span>
+        <span class="sum-val red" id="sum_promo">-R$540,00</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Imposto de importação</span>
+        <span class="sum-val">R$0,00</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">ICMS</span>
+        <span class="sum-val">R$0,00</span>
+      </div>
+
+      <div class="sum-divider"></div>
+      <div class="sum-total-row">
+        <span class="sum-total-label">Total</span>
+        <span class="sum-total-val" id="sum_total">R$147,90</span>
+      </div>
+
+      <button class="btn-order" id="btn_order">Fazer o pedido</button>
+      <div class="sum-disclaimer">
+        Ao clicar "Confirmar compra", eu afirmo que li e estou de acordo <a href="#">com os termos e condições de uso</a>.
+      </div>
+    </div>
+
+    <!-- ALIEXPRESS SECURITY -->
+    <div class="card">
+      <div class="sec-card-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="sec-title">AliExpress</div>
+      </div>
+      <div class="sec-desc">O AliExpress mantém suas informações e pagamentos protegidos</div>
+      <div class="sec-icons">
+        <div class="sec-icon" style="font-size:7px;color:#1565c0;font-weight:900;">VISA</div>
+        <div class="sec-icon" style="background:#eb001b;border-color:#eb001b;"></div>
+        <div class="sec-icon" style="color:#00a650;font-size:8px;">SafeKey</div>
+      </div>
+    </div>
+
+    <!-- ENTREGA RÁPIDA -->
+    <div class="card">
+      <div class="fast-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3m2 4h2l3 4-3 4h-2v-4"/><rect x="9" y="11" width="14" height="10" rx="1"/></svg>
+        Entrega rápida &nbsp;<span style="color:#09f;font-size:12px;">›</span>
+      </div>
+      <div class="fast-items">
+        <div><span class="check">✓</span>cupom de R$5,00 por entrega atrasada <span class="check">✓</span></div>
+        <div>Reembolso se itens chegarem com dano <span class="check">✓</span></div>
+        <div>Reembolso se o pacote for perdido <span class="check">✓</span> Reembolso se não for entregue em 50 dias</div>
+      </div>
+    </div>
+
+    <!-- SEGURANÇA E PRIVACIDADE -->
+    <div class="card">
+      <div class="fast-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Segurança e privacidade &nbsp;<span style="color:#09f;font-size:12px;">›</span>
+      </div>
+      <div class="fast-items">Pagamentos seguros · Dados pessoais seguros</div>
+    </div>
+
+    <!-- PAGAMENTOS SEGUROS -->
+    <div class="card">
+      <div class="fast-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pagamentos seguros
+      </div>
+      <div class="pay-logos">
+        <div class="pay-logo-pill" style="color:#1565c0;">VISA</div>
+        <div class="pay-logo-pill" style="color:#eb001b;">Mastercard</div>
+        <div class="pay-logo-pill" style="color:#333;">D-Check</div>
+        <div class="pay-logo-pill" style="color:#00a650;">SafeKey</div>
+        <div class="pay-logo-pill" style="color:#e53935;">Proteção</div>
+        <div class="pay-logo-pill" style="color:#003087;">JCB</div>
+      </div>
+      <div class="sec-desc" style="margin-top:10px;">Conte com a segurança dos seus dados, garantida por nossos parceiros de pagamento.</div>
+    </div>
+
+  </aside>
+
+</div><!-- /page-wrap -->
+
+
+<!-- ====== FOOTER ====== -->
+<footer class="page-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="footer-title">Sobre o AliExpress</div>
+      <div class="footer-links">
+        <a href="#">Central de Ajuda</a>
+        <a href="#">Disputas e Denúncias</a>
+        <a href="#">Política de Devolução e Reembolso</a>
+        <a href="#">Violação de Propriedade Intelectual</a>
+        <a href="#">Informações Regulatórias</a>
+        <a href="#">Informações e contatos para o Brasil</a>
+        <a href="#">Compliance</a>
+        <a href="#">Centro de Transparência</a>
+        <a href="#">Denúncias Anônimas</a>
+        <a href="#">Política de Devolução</a>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="footer-title">Buscar por Categoria</div>
+        <div class="footer-links">
+          <a href="#">Mais Vendidos</a>
+          <a href="#">Itens</a>
+          <a href="#">Promoções</a>
+          <a href="#">Descontos</a>
+          <a href="#">Preço Baixo</a>
+          <a href="#">Avaliações</a>
+          <a href="#">Wiki</a>
+          <a href="#">Blog</a>
+          <a href="#">Vídeo</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-title">Idiomas</div>
+      <div class="footer-links">
+        <a href="#">Русский</a>
+        <a href="#">Português</a>
+        <a href="#">Español</a>
+        <a href="#">Français</a>
+        <a href="#">Deutsch</a>
+        <a href="#">Italiano</a>
+        <a href="#">Nederlands</a>
+        <a href="#">Türk</a>
+        <a href="#">日本語</a>
+        <a href="#">한국어</a>
+        <a href="#">ภาษาไทย</a>
+        <a href="#">עברית</a>
+        <a href="#">اللغة العربية</a>
+        <a href="#">Polski</a>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="footer-links">
+          <a href="#">Site do Alibaba Group</a>
+          <a href="#">AliExpress</a>
+          <a href="#">Alimama</a>
+          <a href="#">Fliggy</a>
+          <a href="#">Alibaba Cloud</a>
+          <a href="#">Alibaba International</a>
+          <a href="#">AliTelecom</a>
+          <a href="#">DingTalk</a>
+          <a href="#">Juhuasuan</a>
+          <a href="#">Taobao Marketplace</a>
+          <a href="#">Tmall</a>
+          <a href="#">Taobao Global</a>
+          <a href="#">AliOS</a>
+          <a href="#">1688</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ====== MODAL: PIX ====== -->
+<div class="modal-overlay" id="modal_pix">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Pagamento via Pix</h3>
+      <button class="modal-close" id="btn_close_pix">×</button>
+    </div>
+    <div class="modal-body pix-modal-inner">
+      <p style="font-size:13px;color:#555;margin-bottom:10px;">Escaneie o QR Code ou copie a chave abaixo para concluir o pagamento</p>
+      <div class="pix-qr-area">
+        <!-- QR Code decorativo SVG -->
+        <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #eee;border-radius:4px;">
+          <rect width="160" height="160" fill="#fff"/>
+          <rect x="8" y="8" width="54" height="54" fill="none" stroke="#222" stroke-width="5"/>
+          <rect x="18" y="18" width="34" height="34" fill="#222"/>
+          <rect x="98" y="8" width="54" height="54" fill="none" stroke="#222" stroke-width="5"/>
+          <rect x="108" y="18" width="34" height="34" fill="#222"/>
+          <rect x="8" y="98" width="54" height="54" fill="none" stroke="#222" stroke-width="5"/>
+          <rect x="18" y="108" width="34" height="34" fill="#222"/>
+          <rect x="70" y="8" width="8" height="8" fill="#222"/>
+          <rect x="80" y="8" width="8" height="8" fill="#222"/>
+          <rect x="70" y="18" width="8" height="8" fill="#222"/>
+          <rect x="70" y="28" width="8" height="8" fill="#222"/>
+          <rect x="80" y="28" width="8" height="8" fill="#222"/>
+          <rect x="70" y="38" width="8" height="8" fill="#222"/>
+          <rect x="80" y="48" width="8" height="8" fill="#222"/>
+          <rect x="70" y="58" width="8" height="8" fill="#222"/>
+          <rect x="8" y="70" width="8" height="8" fill="#222"/>
+          <rect x="18" y="70" width="8" height="8" fill="#222"/>
+          <rect x="28" y="70" width="8" height="8" fill="#222"/>
+          <rect x="38" y="70" width="8" height="8" fill="#222"/>
+          <rect x="48" y="70" width="8" height="8" fill="#222"/>
+          <rect x="58" y="70" width="8" height="8" fill="#222"/>
+          <rect x="70" y="70" width="20" height="20" fill="#00bdae"/>
+          <rect x="98" y="70" width="8" height="8" fill="#222"/>
+          <rect x="110" y="70" width="8" height="8" fill="#222"/>
+          <rect x="130" y="70" width="8" height="8" fill="#222"/>
+          <rect x="144" y="70" width="8" height="8" fill="#222"/>
+          <rect x="98" y="80" width="8" height="8" fill="#222"/>
+          <rect x="120" y="80" width="8" height="8" fill="#222"/>
+          <rect x="98" y="90" width="8" height="8" fill="#222"/>
+          <rect x="110" y="90" width="8" height="8" fill="#222"/>
+          <rect x="120" y="90" width="8" height="8" fill="#222"/>
+          <rect x="130" y="90" width="8" height="8" fill="#222"/>
+          <rect x="144" y="90" width="8" height="8" fill="#222"/>
+          <rect x="70" y="98" width="8" height="8" fill="#222"/>
+          <rect x="70" y="108" width="8" height="8" fill="#222"/>
+          <rect x="80" y="108" width="8" height="8" fill="#222"/>
+          <rect x="70" y="118" width="8" height="8" fill="#222"/>
+          <rect x="70" y="128" width="8" height="8" fill="#222"/>
+          <rect x="80" y="130" width="8" height="8" fill="#222"/>
+          <rect x="70" y="144" width="8" height="8" fill="#222"/>
+          <rect x="98" y="108" width="8" height="8" fill="#222"/>
+          <rect x="120" y="108" width="8" height="8" fill="#222"/>
+          <rect x="144" y="108" width="8" height="8" fill="#222"/>
+          <rect x="98" y="120" width="8" height="8" fill="#222"/>
+          <rect x="108" y="120" width="8" height="8" fill="#222"/>
+          <rect x="130" y="120" width="8" height="8" fill="#222"/>
+          <rect x="98" y="132" width="8" height="8" fill="#222"/>
+          <rect x="108" y="144" width="8" height="8" fill="#222"/>
+          <rect x="120" y="144" width="8" height="8" fill="#222"/>
+          <rect x="132" y="132" width="8" height="8" fill="#222"/>
+          <rect x="144" y="132" width="8" height="8" fill="#222"/>
+          <rect x="144" y="144" width="8" height="8" fill="#222"/>
+        </svg>
+      </div>
+      <div class="pix-copy-row">
+        <span class="pix-copy-key" id="pix_key_text">00020126580014br.gov.bcb.pix01366b2d3a89-fastfish-store52040000530398654051479055020053630</span>
+        <button class="btn-copy-pix" id="btn_copy_pix">Copiar</button>
+      </div>
+      <div class="pix-timer">⏱ Expira em: <span id="pix_countdown">15:00</span></div>
+      <ul class="pix-steps-list">
+        <li>1. Abra o app do seu banco</li>
+        <li>2. Acesse a área Pix → "QR Code" ou "Pix Copia e Cola"</li>
+        <li>3. Cole ou escaneie o código acima</li>
+        <li>4. Confirme o pagamento de <strong id="pix_value">R$147,90</strong></li>
+        <li>5. Pronto! Confirmação em instantes ✓</li>
+      </ul>
+      <button class="btn-confirm-pay" id="btn_pix_confirm">Já realizei o pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: SUCESSO ====== -->
+<div class="modal-overlay" id="modal_success">
+  <div class="modal-box">
+    <div class="success-body">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Pedido Confirmado!</div>
+      <div class="success-sub">Seu pedido do <strong>Kit Pesca FastFish</strong> foi recebido com sucesso!<br>Você receberá uma confirmação em breve.<br>Prazo de entrega: <strong>3 a 7 dias úteis</strong> 🚚</div>
+      <div class="success-box">
+        ✓ Pagamento Pix confirmado<br>
+        ✓ Enviado do Brasil · Frete Grátis<br>
+        ✓ Rastreio incluso via Correios / Transportadora
+      </div>
+      <button class="btn-back" onclick="window.location.href='index.html'">Voltar à Loja</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function() {
+  'use strict';
+
+  var UNIT = 147.90;
+  var qty = 1;
+
+  function fmt(v) {
+    return 'R$' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  function updateTotals() {
+    var total = UNIT * qty;
+    document.getElementById('prod_unit_price').childNodes[0].textContent = fmt(UNIT) + ' ';
+    document.getElementById('sum_subtotal').textContent = fmt(total);
+    document.getElementById('sum_total').textContent = fmt(total);
+    document.getElementById('sum_promo').textContent = '-' + fmt(540.00 * qty);
+    document.getElementById('pix_value').textContent = fmt(total);
+  }
+
+  // QTY
+  document.getElementById('qty_plus').addEventListener('click', function() {
+    if (qty < 38) { qty++; document.getElementById('qty_val').value = qty; updateTotals(); }
+  });
+  document.getElementById('qty_minus').addEventListener('click', function() {
+    if (qty > 1) { qty--; document.getElementById('qty_val').value = qty; updateTotals(); }
+  });
+
+  // Modal helpers
+  function open(id) { document.getElementById(id).classList.add('open'); }
+  function close(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.getElementById('btn_close_pix').addEventListener('click', function() { close('modal_pix'); stopTimer(); });
+  document.querySelectorAll('.modal-overlay').forEach(function(el) {
+    el.addEventListener('click', function(e) { if (e.target === el) { el.classList.remove('open'); stopTimer(); } });
+  });
+
+  // ── ADDRESS (inline form) ──
+  var addrForm = document.getElementById('form_address_inline');
+  var addrFilled = document.getElementById('addr_filled');
+  var btnEditAddr = document.getElementById('btn_edit_address');
+
+  function showFormHideSummary() {
+    addrForm.style.display = '';
+    addrFilled.style.display = 'none';
+  }
+  function showSummaryHideForm() {
+    addrForm.style.display = 'none';
+    addrFilled.style.display = '';
+  }
+
+  function loadAddr() {
+    try {
+      var s = JSON.parse(localStorage.getItem('ff_addr') || 'null');
+      if (s && s.name) {
+        document.getElementById('addr_name').textContent = s.name || '';
+        document.getElementById('addr_phone').textContent = s.phone || '';
+        document.getElementById('addr_street').textContent = s.street || '';
+        document.getElementById('addr_city').textContent = s.city || '';
+        // pre-fill form fields
+        document.getElementById('input_name').value = s.raw_name || '';
+        document.getElementById('input_phone').value = s.raw_phone || '';
+        document.getElementById('input_cep').value = s.cep || '';
+        document.getElementById('input_street').value = s.streetName || '';
+        document.getElementById('input_number').value = s.number || '';
+        document.getElementById('input_comp').value = s.comp || '';
+        document.getElementById('input_bairro').value = s.bairro || '';
+        document.getElementById('input_city').value = s.cityName || '';
+        document.getElementById('input_state').value = s.state || '';
+        showSummaryHideForm();
+      } else {
+        showFormHideSummary();
+      }
+    } catch(e) { showFormHideSummary(); }
+  }
+
+  // Clear old fake data
+  try {
+    var _old = JSON.parse(localStorage.getItem('ff_addr') || 'null');
+    if (_old && _old.name === 'WENIA REIS DOS SANTOS') localStorage.removeItem('ff_addr');
+  } catch(e) {}
+
+  loadAddr();
+
+  // "Alterar" button => show form again
+  btnEditAddr.addEventListener('click', function() {
+    showFormHideSummary();
+    document.getElementById('input_name').focus();
+  });
+
+  // Phone mask
+  document.getElementById('input_phone').addEventListener('input', function() {
+    var v = this.value.replace(/\D/g,'').substring(0,11);
+    if (v.length > 10) v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+    else if (v.length > 6) v='('+v.slice(0,2)+') '+v.slice(2,6)+'-'+v.slice(6);
+    else if (v.length > 2) v='('+v.slice(0,2)+') '+v.slice(2);
+    else if (v.length > 0) v='('+v;
+    this.value = v;
+  });
+
+  // CEP mask + auto-busca
+  document.getElementById('input_cep').addEventListener('input', function() {
+    var v = this.value.replace(/\D/g,'').substring(0,8);
+    if (v.length > 5) v = v.slice(0,5)+'-'+v.slice(5);
+    this.value = v;
+    // auto-busca ao digitar 8 dígitos
+    if (v.replace(/\D/g,'').length === 8) {
+      document.getElementById('btn_busca_cep').click();
+    }
+  });
+
+  // CEP lookup
+  document.getElementById('btn_busca_cep').addEventListener('click', function() {
+    var cep = document.getElementById('input_cep').value.replace(/\D/g,'');
+    if (cep.length !== 8) { alert('CEP inválido. Digite 8 dígitos.'); return; }
+    var btn = this;
+    btn.textContent = '...';
+    fetch('https://viacep.com.br/ws/'+cep+'/json/')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        btn.textContent = 'Buscar';
+        if (d.erro) { alert('CEP não encontrado.'); return; }
+        document.getElementById('input_street').value = d.logradouro || '';
+        document.getElementById('input_bairro').value = d.bairro || '';
+        document.getElementById('input_city').value = d.localidade || '';
+        document.getElementById('input_state').value = d.uf || '';
+        document.getElementById('input_number').focus();
+      })
+      .catch(function(){ btn.textContent='Buscar'; alert('Erro ao buscar CEP. Preencha manualmente.'); });
+  });
+
+  // Address form submit (inline)
+  addrForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var nm  = document.getElementById('input_name').value.trim();
+    var ph  = document.getElementById('input_phone').value.trim();
+    var cep = document.getElementById('input_cep').value.trim();
+    var sn  = document.getElementById('input_street').value.trim();
+    var num = document.getElementById('input_number').value.trim();
+    var cp  = document.getElementById('input_comp').value.trim();
+    var bai = document.getElementById('input_bairro').value.trim();
+    var ci  = document.getElementById('input_city').value.trim();
+    var st  = document.getElementById('input_state').value.trim().toUpperCase();
+
+    var street = sn + ', ' + num + (cp ? ' - ' + cp : '') + (bai ? ', ' + bai : '');
+    var city   = ci + ' - ' + st + ', CEP: ' + cep + ', Brasil';
+
+    document.getElementById('addr_name').textContent = nm.toUpperCase();
+    document.getElementById('addr_phone').textContent = ph;
+    document.getElementById('addr_street').textContent = street;
+    document.getElementById('addr_city').textContent = city;
+
+    try {
+      localStorage.setItem('ff_addr', JSON.stringify({
+        name: nm.toUpperCase(), raw_name: nm, phone: ph, raw_phone: ph,
+        cep: cep, streetName: sn, number: num, comp: cp, bairro: bai,
+        cityName: ci, state: st, street: street, city: city
+      }));
+    } catch(e) {}
+
+    showSummaryHideForm();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ── PIX TIMER ──
+  var timerInt = null;
+  function startTimer() {
+    var s = 15*60;
+    function tick() {
+      var m=Math.floor(s/60), sec=s%60;
+      var el=document.getElementById('pix_countdown');
+      if(el) el.textContent=(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+      if(s===0){stopTimer();close('modal_pix');}
+      s--;
+    }
+    tick();
+    timerInt = setInterval(tick,1000);
+  }
+  function stopTimer() { if(timerInt){clearInterval(timerInt);timerInt=null;} }
+
+  // Order button → PIX modal (exige endereço preenchido)
+  document.getElementById('btn_order').addEventListener('click', function() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem('ff_addr') || 'null'); } catch(e) {}
+    if (!saved || !saved.name) {
+      // Destaca o formulário de endereço
+      var addrCard = addrForm.closest('.card');
+      addrCard.style.boxShadow = '0 0 0 2px #e53935';
+      addrCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('input_name').focus();
+      setTimeout(function(){ addrCard.style.boxShadow = ''; }, 3000);
+      return;
+    }
+    stopTimer();
+    open('modal_pix');
+    startTimer();
+  });
+
+  // Copy PIX
+  document.getElementById('btn_copy_pix').addEventListener('click', function() {
+    var key = document.getElementById('pix_key_text').textContent;
+    var btn = this;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(key).then(function() {
+        btn.textContent='Copiado!'; btn.style.background='#00875a';
+        setTimeout(function(){btn.textContent='Copiar';btn.style.background='';},2000);
+      });
+    } else {
+      var ta=document.createElement('textarea');ta.value=key;
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent='Copiado!';
+      setTimeout(function(){btn.textContent='Copiar';},2000);
+    }
+  });
+
+  // Confirm payment → success
+  document.getElementById('btn_pix_confirm').addEventListener('click', function() {
+    stopTimer();
+    close('modal_pix');
+    open('modal_success');
+  });
+
+  updateTotals();
+})();
+</script>
+</body>
+</html>
