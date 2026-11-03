@@ -675,7 +675,7 @@
       </div>
       <div class="prod-row">
         <img class="prod-img"
-          src="./index_files/fastfish/kit.webp"
+          src="./assets/Kit de Pesca FastFish Completo.png"
           alt="Kit Pesca FastFish"
           style="width:80px;height:80px;object-fit:cover;border:1px solid #eee;flex-shrink:0;"
           onerror="this.src='./assets/Kit de Pesca Completo FastFish.png'">
@@ -683,6 +683,10 @@
           <div class="prod-price" id="prod_unit_price">
             R$147,90
             <span class="prod-price-old">R$687,90</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:12px;color:#555;">
+            <span>Cor da isca:</span>
+            <span id="checkout_color_val" style="font-weight:600;color:#e53935;background:#fff2f2;padding:2px 8px;border-radius:4px;border:1px solid #ffd0d0;">Fire Tiger</span>
           </div>
           <div class="qty-control">
             <button class="qty-btn" id="qty_minus" aria-label="Diminuir">−</button>
@@ -984,6 +988,14 @@
 
   var UNIT = 147.90;
   var qty = 1;
+
+  try {
+    var savedColor = localStorage.getItem('fastfish_selected_color');
+    if (savedColor) {
+      var colorEl = document.getElementById('checkout_color_val');
+      if (colorEl) colorEl.textContent = savedColor;
+    }
+  } catch(e) {}
 
   function fmt(v) {
     return 'R$' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
