@@ -550,6 +550,7 @@
       .footer-inner { flex-direction: column; gap: 20px; }
     }
   </style>
+  <script src="./assets/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -914,8 +915,13 @@
       <div id="pix_content" style="display:none;">
         <p style="font-size:13px;color:#555;margin-bottom:12px;">Escaneie o QR Code ou copie o código Pix abaixo para pagar:</p>
         
-        <div class="pix-qr-area" style="margin:12px 0;">
-          <img id="pix_qr_img" src="" alt="QR Code Pix Oficial BravoPay" width="180" height="180" style="border:1px solid #e0e0e0;border-radius:8px;padding:6px;background:#fff;display:inline-block;">
+        <div class="pix-qr-area" style="margin:16px 0;display:flex;justify-content:center;">
+          <div id="pix_qr_box" style="display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);min-width:210px;min-height:210px;">
+            <!-- QR Code renderizado nativamente pelo navegador -->
+            <div id="pix_qr_inner" style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:12px;color:#888;">Carregando QR Code...</span>
+            </div>
+          </div>
         </div>
 
         <div class="pix-copy-row" style="margin:12px 0;">
@@ -1239,6 +1245,51 @@
   }
 
   // Criar transação PIX na BravoPay
+    // Renderização 100% nativa do QR Code (sem chamadas a APIs externas)
+  function renderPixQrCode(pixPayload) {
+    var box = document.getElementById('pix_qr_inner') || document.getElementById('pix_qr_box');
+    if (!box) return;
+
+    if (!pixPayload || !pixPayload.trim()) {
+      box.innerHTML = '<span style="font-size:12px;color:#c62828;">Código Pix indisponível</span>';
+      return;
+    }
+
+    try {
+      if (typeof qrcode !== 'undefined') {
+        var qr = qrcode(0, 'M');
+        qr.addData(pixPayload);
+        qr.make();
+        var dataUrl = qr.createDataURL(5, 3);
+        box.innerHTML = '<img id="pix_qr_img" src="' + dataUrl + '" alt="QR Code Pix Oficial" width="200" height="200" style="display:block;width:200px;height:200px;margin:0 auto;border-radius:6px;image-rendering:pixelated;">';
+        return;
+      }
+    } catch(err) {
+      console.warn('Tentativa com DataURL falhou, usando SVG:', err);
+    }
+
+    try {
+      if (typeof qrcode !== 'undefined') {
+        var qrSvg = qrcode(0, 'M');
+        qrSvg.addData(pixPayload);
+        qrSvg.make();
+        box.innerHTML = qrSvg.createSvgTag({ cellSize: 4, margin: 3, scalable: true });
+        var svgEl = box.querySelector('svg');
+        if (svgEl) {
+          svgEl.setAttribute('width', '200');
+          svgEl.setAttribute('height', '200');
+          svgEl.style.display = 'block';
+          svgEl.style.margin = '0 auto';
+        }
+        return;
+      }
+    } catch(err2) {
+      console.warn('Tentativa SVG falhou:', err2);
+    }
+
+    box.innerHTML = '<img id="pix_qr_img" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=4&data=' + encodeURIComponent(pixPayload) + '" width="200" height="200" alt="QR Code Pix" style="display:block;margin:0 auto;">';
+  }
+
   function createBravoPayPix() {
     var loadingEl = document.getElementById('pix_loading');
     var contentEl = document.getElementById('pix_content');
@@ -1309,10 +1360,7 @@
         keyTextEl.title = pixCopyPaste;
       }
 
-      var qrImgEl = document.getElementById('pix_qr_img');
-      if (qrImgEl) {
-        qrImgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=4&data=' + encodeURIComponent(pixCopyPaste);
-      }
+      renderPixQrCode(pixCopyPaste);
 
       var pixValEl = document.getElementById('pix_value');
       if (pixValEl) {
